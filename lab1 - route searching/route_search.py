@@ -59,6 +59,53 @@ def gen_map(cities, n, density, symmetric):
                         map[i][j] = distance
     return map
 
+def tsp_bfs(map, start_city):
+    n = len(map)
+
+    queue = [(start_city, [start_city], 0)]
+
+    best_path = None
+    min_cost = float('inf')
+
+    while queue:
+        city, path, cost = queue.pop(0) # FIFO
+
+        if len(path) == n:
+            if map[city][start_city] > 0:
+                cost += map[city][start_city]
+                if cost < min_cost:
+                    min_cost = cost
+                    best_path = path + [start_city]
+        else:
+            for next_city in range(n):
+                if next_city not in path and map[city][next_city] != 0:
+                    queue.append((next_city, path + [next_city], cost + map[city][next_city]))
+    return best_path, min_cost
+
+def tsp_dfs(map, start_city):
+    n = len(map)
+
+    stack = [(start_city, [start_city], 0)] # LIFO
+
+    best_path = None
+    min_cost = float('inf')
+
+    while stack:
+        city, path, cost = stack.pop()
+
+        if len(path) == n:
+            if map[city][start_city] > 0:
+                cost += map[city][start_city]
+                if cost < min_cost:
+                    min_cost = cost
+                    best_path = path + [start_city]
+        else:
+            for next_city in range(n-1, -1, -1):
+                if next_city not in path and map[city][next_city] > 0:
+                    stack.append((next_city, path + [next_city], cost + map[city][next_city]))
+    return best_path, min_cost
+
+
 def main(num_cities, density, symmetric, debug):
     #generate cities
     n = num_cities
@@ -73,5 +120,30 @@ def main(num_cities, density, symmetric, debug):
         map_print(n, map)
     
 
+    #TSP
+    start_city = 0 
+
+    bfs_path, bfs_cost = tsp_bfs(map, start_city)
+    print(f"BFS\nCost: {bfs_cost:.4f}\nPath: {bfs_path}\n")
+
+    dfs_path, dfs_cost = tsp_dfs(map, start_city)
+    print(f"DFS\nCost: {dfs_cost:.4f}\nPath: {dfs_path}")
+
+
+
+
 if __name__ == "__main__":
-    main(num_cities = 10, density=1.0, symmetric=True, debug=True)
+    # main(num_cities = 7, density=1.0, symmetric=True, debug=False)
+    n_cities = 7
+
+    print("\n100% connections, Symmetric")
+    main(num_cities=n_cities, density=1.0, symmetric=True, debug=False)
+    
+    print("\n80% connections, Symmetric")
+    main(num_cities=n_cities, density=0.8, symmetric=True, debug=False)
+    
+    print("\n100% connections, Asymmetric")
+    main(num_cities=n_cities, density=1.0, symmetric=False, debug=False)
+    
+    print("\n80% connections, Asymmetric")
+    main(num_cities=n_cities, density=0.8, symmetric=False, debug=False)
