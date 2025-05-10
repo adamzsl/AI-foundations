@@ -1,9 +1,4 @@
 import time
-import sys
-import os
-
-# Add parent directory to path to access other lab modules
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from lab1.route_search import tsp_bfs, tsp_dfs
 from lab2.greedy import tsp_nn, tsp_greedy
@@ -18,58 +13,58 @@ def min_path(map):
             if map[i][j] != 0 and i != j and map[i][j]<h:
                 h = map[i][j]
     return h
+
+class Node:
+    def __init__(self, parent, city, g, path):
+        self.parent = parent
+        self.city = city
+        self.g = g         # cost from start
+        self.h = 0         # heuristic cost
+        self.f = 0         # total cost = g + h
+        self.path = path   # visited sequence of cities
+
+    def __eq__(self, other):
+        return self.path == other.path
     
 
 def astar(map, start_city):
     n = len(map)
-    open = [(start_city, 0, 0, 0, [start_city])] # (city, g, h, f, path)
-    closed = []
+    h_cost = min_path(map) # smallest edge in graph
+    start = Node(None, start_city, 0, [start_city])
+    open, closed = [start], []
 
-    h_cost = min_path(map)
     
     while open:
-        current_index = 0
-        for i, (_, _, _, f, _) in enumerate(open): # lowest f cost
-            if f < open[current_index][3]:
-                current_index = i
+        # node with lowest f
+        current = min(open, key=lambda node: node.f)
+        open.remove(current)
+        closed.append(current)
+        
+         # goal: visited all cities and can return to start
+        if len(current.path) == n and map[current.city][start_city] > 0:
+            final_cost = current.g + map[current.city][start_city]
+            return current.path + [start_city], final_cost
 
-        # remove current city from open and add to closed
-        current = open.pop(current_index)
-        current_city, g_cost, _, _, path = current
-        closed.append(current_city)
-        
-        if len(path) == n:
-            if map[current_city][start_city] > 0:
-                final_cost = g_cost + map[current_city][start_city]
-                final_path = path + [start_city]
-                return final_path, final_cost
-            continue # if cannot return to start city, try next path
-        
         for child in range(n):
             
             # skip if no path or already visited
-            if map[current_city][child] == 0 or child in path:
+            if map[current.city][child] == 0 or child in current.path:
                 continue
             
-            new_g = g_cost + map[current_city][child]
-            
-            new_h = h_cost * (n - len(path))
-            new_f = new_g + new_h
-            
-            new_path = path + [child]
-            
-            # check if child is in open list with a lower f cost
-            skip = False
-            for _, (city, _, _, f_, _) in enumerate(open):
-                if city == child and f_ <= new_f:
-                    skip = True
-                    break
-            
-            if skip:
+            g2 = current.g + map[current.city][child]
+            h2 = h_cost * (n - len(current.path))   # admissible heuristic
+            f2 = g2 + h2
+            path2 = current.path + [child]
+            child = Node(current, child, g2, path2)
+            child.h, child.f = h2, f2
+
+            # skip if a better or equal path already seen
+            dup = lambda lst: any(node.path == child.path and node.f <= child.f for node in lst)
+            if dup(open) or dup(closed):
                 continue
-            
-            open.append((child, new_g, new_h, new_f, new_path))
-            
+
+            open.append(child)
+
     return None, -1
 
 
