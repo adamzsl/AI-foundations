@@ -14,6 +14,16 @@ def min_path(map):
                 h = map[i][j]
     return h
 
+def avg_edge(map):
+    n = len(map)
+    total, count = 0.0, 0
+    for i in range(n):
+        for j in range(n):
+            if map[i][j] != 0 and i != j:
+                total += map[i][j]
+                count += 1
+    return (total / count)
+
 class Node:
     def __init__(self, parent, city, g, path):
         self.parent = parent
