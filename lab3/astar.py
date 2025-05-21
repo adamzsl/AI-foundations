@@ -45,12 +45,11 @@ def astar(map, start_city):
 
     
     while open:
-        # node with lowest f
-        current = min(open, key=lambda node: node.f)
+        current = min(open, key=lambda node: node.f) # node with lowest f
         open.remove(current)
         closed.append(current)
         
-         # goal: visited all cities and can return to start
+        # goal: visited all cities and can return to start
         if len(current.path) == n and map[current.city][start_city] > 0:
             final_cost = current.g + map[current.city][start_city]
             return current.path + [start_city], final_cost
@@ -69,8 +68,8 @@ def astar(map, start_city):
             child.h, child.f = h2, f2
 
             # skip if a better or equal path already seen
-            dup = lambda lst: any(node.path == child.path and node.f <= child.f for node in lst)
-            if dup(open) or dup(closed):
+            better_f = lambda lst: any(node.path == child.path and node.f <= child.f for node in lst)
+            if better_f(open) or better_f(closed):
                 continue
 
             open.append(child)
