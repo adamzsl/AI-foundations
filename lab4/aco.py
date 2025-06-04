@@ -28,9 +28,9 @@ def aco(map, start_city, n_ants, n_iterations, alpha, beta, evaporation, Q):
             while not all(visited):
                 unv = np.where(np.logical_not(visited))[0] # indices of unvisited cities
                 probs = np.array([
-                    pheromone[current, j]**alpha / (map[current][j]**beta)
+                    pheromone[current, j]**alpha / (map[current][j]**beta) # τ (ij) ^ α / η (ij) ^ β
                     for j in unv
-                ]) # 
+                ])
                 probs /= probs.sum() # normalize to sum to 1
                 nxt = np.random.choice(unv, p=probs) # select next city based on probabilities
 
