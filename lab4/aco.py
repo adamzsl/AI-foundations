@@ -26,7 +26,10 @@ def aco(map, start_city, n_ants, n_iterations, alpha, beta, evaporation, Q):
 
             # visit all other cities
             while not all(visited):
-                unv = np.where(np.logical_not(visited))[0] # indices of unvisited cities
+                unv = [j for j in range(n) if not visited[j] and map[current][j] > 0] # indices of unvisited cities
+                if not unv:
+                    length = np.inf # no unvisited cities left, break the loop
+                    break
                 probs = np.array([
                     pheromone[current, j]**alpha / (map[current][j]**beta) # τ (ij) ^ α / η (ij) ^ β
                     for j in unv
@@ -39,17 +42,18 @@ def aco(map, start_city, n_ants, n_iterations, alpha, beta, evaporation, Q):
                 visited[nxt] = True
                 current = nxt
 
-            # close the tour back to start_city
-            length += map[current][start_city]
-            path.append(start_city)
+            # close the tour back to start_city if possible
+            if length != np.inf and map[current][start_city] > 0:
+                length += map[current][start_city]
+                path.append(start_city)
 
-            all_paths.append(path)
-            all_lengths.append(length)
+                all_paths.append(path)
+                all_lengths.append(length)
 
-            # update global best
-            if length < total_cost:
-                best_path = path.copy()
-                total_cost = length
+                # update global best
+                if length < total_cost:
+                    best_path = path.copy()
+                    total_cost = length
 
         # evaporate
         pheromone *= (1 - evaporation)
@@ -61,6 +65,8 @@ def aco(map, start_city, n_ants, n_iterations, alpha, beta, evaporation, Q):
             for i in range(len(path) - 1):
                 pheromone[path[i], path[i+1]] += delta # add pheromone to the edge
 
+    if not best_path:
+        return [], -1
     return best_path, total_cost
 
 
