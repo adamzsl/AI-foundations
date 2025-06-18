@@ -117,19 +117,19 @@ def main(num_cities, density, symmetric, debug):
     dfs_path, dfs_cost = tsp_dfs(map, start_city)
     end_time = time.time()
     dfs_time = end_time - start_time
-    print(f"DFS\nTime: {dfs_time}\nCost: {dfs_cost:.4f}\nPath: {dfs_path}")
+    print(f"DFS\nTime: {dfs_time}\nCost: {dfs_cost:.4f}\nPath: {dfs_path}\n")
 
     start_time = time.time()
     nn_path, nn_cost = tsp_nn(map, start_city)
     end_time = time.time()
     nn_time = end_time - start_time
-    print(f"NN\nTime: {nn_time}\nCost: {nn_cost:.4f}\nPath: {nn_path}")
+    print(f"NN\nTime: {nn_time}\nCost: {nn_cost:.4f}\nPath: {nn_path}\n")
 
     start_time = time.time()
     greedy_path, greedy_cost = tsp_greedy(map, start_city)
     end_time = time.time()
     greedy_time = end_time - start_time
-    print(f"Greedy\nTime: {greedy_time}\nCost: {greedy_cost:.4f}\nPath: {greedy_path}")
+    print(f"Greedy\nTime: {greedy_time}\nCost: {greedy_cost:.4f}\nPath: {greedy_path}\n")
 
 
 if __name__ == "__main__":
